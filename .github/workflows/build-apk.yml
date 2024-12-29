@@ -3,7 +3,7 @@ name: Build Kivy APK
 on:
   push:
     branches:
-      - main # Adjust this to your target branch
+      - main # Adjust to your target branch
 
 jobs:
   build-apk:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9" # Specify the Python version
+          python-version: "3.9"
 
       # Install dependencies
       - name: Install Buildozer and dependencies
@@ -27,33 +27,36 @@ jobs:
           sudo apt install -y python3-pip python3-venv git zip unzip openjdk-11-jdk cython3
           pip install --upgrade buildozer
 
-      # Install Android SDK and required tools
+      # Install Android SDK
       - name: Install Android SDK
         run: |
-          sudo apt install -y wget
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
           mkdir -p $HOME/android/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
           unzip cmdline-tools.zip -d $HOME/android/cmdline-tools
+          mv $HOME/android/cmdline-tools/cmdline-tools $HOME/android/cmdline-tools/latest
           export ANDROID_HOME=$HOME/android
-          export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34"
 
       # Initialize Buildozer
       - name: Initialize Buildozer
         run: |
           buildozer init
-          sed -i 's/^source.include_exts/# source.include_exts/' buildozer.spec  # Disable source.include_exts
-          sed -i 's/^source.exclude_exts/# source.exclude_exts/' buildozer.spec  # Disable source.exclude_exts
-          echo "source.include_exts = py, kv" >> buildozer.spec                  # Include app.py and KV files
-          echo "title = My Kivy App" >> buildozer.spec                          # Set app title
+          sed -i 's/^source.include_exts/# source.include_exts/' buildozer.spec
+          sed -i 's/^source.exclude_exts/# source.exclude_exts/' buildozer.spec
+          echo "source.include_exts = py, kv" >> buildozer.spec
+          echo "title = My Kivy App" >> buildozer.spec
 
       # Build the APK
       - name: Build APK
-        run: buildozer android debug
+        run: |
+          export ANDROID_HOME=$HOME/android
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+          buildozer android debug
 
       # Upload the APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: Kivy-App-APK
-          path: bin/*.apk # Adjust path if necessary
+          path: bin/*.apk
