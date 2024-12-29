@@ -31,9 +31,13 @@ jobs:
         run: |
           sudo apt-get install -y openjdk-8-jdk
           wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip
-          unzip commandlinetools-linux-6609375_latest.zip -d $HOME/android-sdk
-          yes | $HOME/android-sdk/tools/bin/sdkmanager --licenses
-          $HOME/android-sdk/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip commandlinetools-linux-6609375_latest.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/tools
+          yes | $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager --licenses
+          $HOME/android-sdk/cmdline-tools/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+        env:
+          ANDROID_HOME: $HOME/android-sdk
 
       - name: Create buildozer.spec if not exists
         run: |
