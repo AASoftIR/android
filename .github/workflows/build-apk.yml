@@ -38,10 +38,9 @@ jobs:
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
           wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O android-sdk-tools.zip
-          mkdir -p ~/.android/cmdline-tools
-          unzip android-sdk-tools.zip -d ~/.android/cmdline-tools
+          mkdir -p ~/.android/cmdline-tools/tools
+          unzip android-sdk-tools.zip -d ~/.android/cmdline-tools/tools
           rm android-sdk-tools.zip
-          mv ~/.android/cmdline-tools/cmdline-tools ~/.android/cmdline-tools/tools
           yes | ~/.android/cmdline-tools/tools/bin/sdkmanager --sdk_root=~/android-sdk --licenses
           yes | ~/.android/cmdline-tools/tools/bin/sdkmanager --sdk_root=~/android-sdk --install "build-tools;30.0.3" "platforms;android-30" "platform-tools"
           echo "export ANDROIDSDK=~/android-sdk" >> ~/.bashrc
