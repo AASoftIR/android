@@ -38,6 +38,7 @@ jobs:
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
           wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O android-sdk-tools.zip
+          mkdir -p ~/.android/cmdline-tools
           unzip android-sdk-tools.zip -d ~/.android/cmdline-tools
           rm android-sdk-tools.zip
           mv ~/.android/cmdline-tools/cmdline-tools ~/.android/cmdline-tools/tools
