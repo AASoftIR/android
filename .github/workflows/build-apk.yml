@@ -29,9 +29,16 @@ jobs:
           python3 -m pip install --upgrade buildozer kivy cython
 
       - name: Set up Android build environment
-        uses: actions/setup-android-build-environment@v1
+        uses: android/setup-android@v3
         with:
           android-version: "33"
+          android-components: "build-tools;33.0.0, platform-tools, android-33"
+          license-acceptance: "auto"
+
+      - name: Debug environment
+        run: |
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          echo "PATH: $PATH"
 
       - name: Build APK
         run: |
