@@ -1,16 +1,16 @@
-name: Build Kivy APK
+name: Build APK from Kivy App
 
 on:
   push:
     branches:
-      - main # Adjust to your target branch
+      - main # Change this to your default branch if it's not 'main'
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
+      # Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -18,41 +18,29 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.9" # Use the Python version compatible with your Kivy app
 
       # Install dependencies
-      - name: Install Buildozer and dependencies
+      - name: Install system dependencies
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip python3-venv git zip unzip openjdk-11-jdk cython3
-          pip install --upgrade buildozer
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-8-jdk
 
-      # Install Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/sdk-setup@v2
-        with:
-          android-version: "33" # Adjust according to your app's requirements
-          build-tools-version: "33.0.0" # Specify the required build-tools version
-
-      # Initialize Buildozer
-      - name: Initialize Buildozer
+      # Install Buildozer and Kivy
+      - name: Install Python dependencies
         run: |
-          buildozer init
-          sed -i 's/^source.include_exts/# source.include_exts/' buildozer.spec
-          sed -i 's/^source.exclude_exts/# source.exclude_exts/' buildozer.spec
-          echo "source.include_exts = py, kv" >> buildozer.spec
-          echo "title = My Kivy App" >> buildozer.spec
+          python3 -m pip install --upgrade pip
+          python3 -m pip install buildozer kivy
 
-      # Build the APK
+      # Initialize Buildozer and build the APK
       - name: Build APK
         run: |
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-          buildozer android debug
+          buildozer init
+          buildozer -v android debug
 
       # Upload the APK as an artifact
-      - name: Upload APK
+      - name: Upload APK as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Kivy-App-APK
+          name: app-debug.apk
           path: bin/*.apk
