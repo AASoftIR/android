@@ -3,57 +3,41 @@ name: Build APK from Kivy App
 on:
   push:
     branches:
-      - main # Change this to your default branch if it's not 'main'
+      - main
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9" # Use the Python version compatible with your Kivy app
+          python-version: "3.9"
 
-      # Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-8-jdk
 
-      # Install Python dependencies (including Cython)
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade buildozer kivy cython
 
-      # Set up Android SDK and accept licenses
-      - name: Set up Android SDK
-        env:
-          ANDROID_HOME: ~/android-sdk
-          PATH: $PATH:$ANDROID_HOME/platform-tools
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O android-sdk-tools.zip
-          unzip android-sdk-tools.zip -d ~/.android/cmdline-tools
-          rm android-sdk-tools.zip
-          yes | ~/.android/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
-          yes | ~/.android/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "build-tools;33.0.0" "platforms;android-33" "platform-tools"
-          chmod -R 755 ~/.android
+      - name: Set up Android build environment
+        uses: actions/setup-android-build-environment@v1
+        with:
+          android-version: "33"
 
-      # Initialize Buildozer and build the APK
       - name: Build APK
         run: |
           buildozer init
           buildozer -v android debug
 
-      # Upload the APK as an artifact
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v3
         with:
