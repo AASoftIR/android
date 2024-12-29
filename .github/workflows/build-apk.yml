@@ -28,16 +28,11 @@ jobs:
           pip install --upgrade buildozer
 
       # Install Android SDK
-      - name: Install Android SDK
-        run: |
-          mkdir -p $HOME/android/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d $HOME/android/cmdline-tools
-          mv $HOME/android/cmdline-tools/cmdline-tools $HOME/android/cmdline-tools/latest
-          export ANDROID_HOME=$HOME/android
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34"
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+      - name: Setup Android SDK
+        uses: android-actions/sdk-setup@v2
+        with:
+          android-version: "33" # Adjust according to your app's requirements
+          build-tools-version: "33.0.0" # Specify the required build-tools version
 
       # Initialize Buildozer
       - name: Initialize Buildozer
@@ -51,7 +46,7 @@ jobs:
       # Build the APK
       - name: Build APK
         run: |
-          export ANDROID_HOME=$HOME/android
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
           buildozer android debug
 
