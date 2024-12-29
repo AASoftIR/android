@@ -27,6 +27,14 @@ jobs:
           pip install buildozer
           pip install cython
 
+      - name: Install Android SDK
+        run: |
+          sudo apt-get install -y openjdk-8-jdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip
+          unzip commandlinetools-linux-6609375_latest.zip -d $HOME/android-sdk
+          yes | $HOME/android-sdk/tools/bin/sdkmanager --licenses
+          $HOME/android-sdk/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+
       - name: Create buildozer.spec if not exists
         run: |
           if [ ! -f buildozer.spec ]; then
