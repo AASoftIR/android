@@ -32,7 +32,7 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install buildozer kivy cython
 
-      # Set up Android SDK
+      # Set up Android SDK and accept licenses
       - name: Set up Android SDK
         run: |
           mkdir -p ~/.android
@@ -40,6 +40,7 @@ jobs:
           wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O android-sdk-tools.zip
           unzip android-sdk-tools.zip -d ~/.android
           rm android-sdk-tools.zip
+          yes | ~/.android/cmdline-tools/bin/sdkmanager --sdk_root=~/android-sdk --licenses
           yes | ~/.android/cmdline-tools/bin/sdkmanager --sdk_root=~/android-sdk --install "build-tools;30.0.3" "platforms;android-30" "platform-tools"
           echo "export ANDROIDSDK=~/android-sdk" >> ~/.bashrc
           echo "export ANDROIDNDK=~/android-sdk/ndk-bundle" >> ~/.bashrc
