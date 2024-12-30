@@ -1,43 +1,35 @@
-name: Build APK
-on: [push]
+name: Build BeeWare App to APK
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y pkg-config libffi-dev libncurses-dev zlib1g-dev libssl-dev build-essential libsqlite3-dev libreadline-dev wget curl unzip
-          pip install --upgrade pip
-          pip install --upgrade buildozer cython
-
-      - name: Install Android command line tools
-        run: |
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip -O tools.zip
-          sudo mkdir -p /usr/local/android-sdk/cmdline-tools
-          sudo unzip -q tools.zip -d /usr/local/android-sdk/cmdline-tools
-          sudo mv /usr/local/android-sdk/cmdline-tools/cmdline-tools /usr/local/android-sdk/cmdline-tools/tools
-          echo "ANDROID_SDK_ROOT=/usr/local/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$PATH:/usr/local/android-sdk/cmdline-tools/tools/bin" >> $GITHUB_ENV
-
-      - name: Create buildozer spec
-        run: buildozer init
-
-      - name: Accept Android licenses
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "build-tools;36.0.0-rc3" "platforms;android-33"
+          python -m pip install --upgrade pip
+          pip install briefcase
 
       - name: Build APK
         run: |
-          buildozer android debug
+          briefcase create android
+          briefcase build android
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: app-debug.apk
-          path: bin/*.apk
+          name: app.apk
+          path: build/*/android/gradle/app/build/outputs/apk/debug/app-debug.apk

@@ -1,20 +1,24 @@
-from kivy.app import App
-from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
-from kivy.core.window import Window
-import webbrowser
+import toga
+from toga.style import Pack
+from toga.style.pack import CENTER, COLUMN
 
-class MyApp(App):
-    def build(self):
-        layout = BoxLayout(orientation='vertical')
-        Window.clearcolor = (0, 0, 0, 1)  # Dark background
-        btn = Button(text='Click Me', size_hint=(None, None), size=(200, 100))
-        btn.bind(on_press=self.open_website)
-        layout.add_widget(btn)
-        return layout
+class MyApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(style=Pack(direction=COLUMN, alignment=CENTER, padding=10))
 
-    def open_website(self, instance):
+        self.button = toga.Button('Go to AASoft', on_press=self.open_url, style=Pack(padding=10))
+        main_box.add(self.button)
+
+        self.main_window = toga.MainWindow(self.name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+    def open_url(self, widget):
+        import webbrowser
         webbrowser.open('https://aasoft.ir')
 
+def main():
+    return MyApp('My BeeWare App', 'org.beeware.myapp')
+
 if __name__ == '__main__':
-    MyApp().run()
+    main().main_loop()
