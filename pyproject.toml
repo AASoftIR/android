@@ -7,3 +7,4 @@ version = "0.1"
 formal_name = "My App"
 description = "My first Briefcase App"
 sources = ['src/myapp']
+license = "MIT"
